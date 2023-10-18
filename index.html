@@ -41,6 +41,29 @@ limitations under the License.
   <script src="lib.js"></script>
 </head>
 <body>
+  <script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-analytics.js";
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+  
+    // Your web app's Firebase configuration
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    const firebaseConfig = {
+      apiKey: "AIzaSyCf3-MxhlOeqhQLEYcY0I0dc-v24U0o-Do",
+      authDomain: "neutral-network-ex.firebaseapp.com",
+      projectId: "neutral-network-ex",
+      storageBucket: "neutral-network-ex.appspot.com",
+      messagingSenderId: "172082221991",
+      appId: "1:172082221991:web:7e75b824a09af728041c82",
+      measurementId: "G-YVHEB74T0Y"
+    };
+  
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+  </script>
   <!-- GitHub link -->
   <a class="github-link" href="https://github.com/tensorflow/playground" title="Source on GitHub" target="_blank">
     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 60.5 60.5" width="60" height="60">
