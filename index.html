@@ -45,6 +45,9 @@ limitations under the License.
     // Import the functions you need from the SDKs you need
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-analytics.js";
+    // import { getDatabase } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-database.js";
+
+   
     // TODO: Add SDKs for Firebase products that you want to use
     // https://firebase.google.com/docs/web/setup#available-libraries
   
@@ -63,6 +66,7 @@ limitations under the License.
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const analytics = getAnalytics(app);
+    // const database = getDatabase();
   </script>
   <!-- GitHub link -->
   <a class="github-link" href="https://github.com/tensorflow/playground" title="Source on GitHub" target="_blank">
@@ -81,7 +85,7 @@ limitations under the License.
     const params = Object.fromEntries(window.location.hash.slice(1).split("&").map( x => x.split("=")))
     return params;
     }
-    const maxPoints = {circle: 75, xor: 50, gauss: 25, spiral: 250};
+    const maxPoints = {circle: 75, xor: 50, gauss: 50, spiral: 250};
 
     function keyParameters(params){
      const dataset = params.dataset
@@ -90,15 +94,17 @@ limitations under the License.
      const nNeurons = params.networkShape.split(",").map(x => parseInt(x)).reduce( (x, y) => x + y, 0)
      const nTotal = nInputs + nNeurons
      const loss = parseFloat(document.getElementById('loss-test').innerHTML)
-     const epochs = parseInt(document.getElementById('iter-number').innerHTML)
+     const epochs = parseInt(document.getElementById('iter-number').innerHTML.replace(/,/g, ''))
      const score = maxPoints[dataset] - loss*1000.0 - epochs/100.0 - nTotal*3.5
      document.getElementById('score').innerHTML = score.toFixed(2)
-     const scoreCalculation = `${score} = ${maxPoints[dataset]} - ${loss}*1000 - ${epochs}/100.0 - ${nTotal}*3.5`
+     const url = window.location.href;
+     const scoreCalculation = `${score.toFixed(2)} = ${maxPoints[dataset]} - ${loss}*1000 - ${epochs}/100.0 - (${nInputs}+${nNeurons})*3.5`
 
      document.getElementById("score_calculation").innerHTML = "Score = MaxPoints - loss*1000 - epochs/100 - (nInputs + nNeurons)*3.5<br>" + scoreCalculation
      name = document.getElementById('name').value
-     return {name, dataset, nInputs, nNeurons, nTotal, loss, epochs, score}
+     return {name, dataset, nInputs, nNeurons, nTotal, loss, epochs, score, url}
     }
+
     let currentScore = {}
 
     function updateScore(){
@@ -108,16 +114,47 @@ limitations under the License.
 
     setInterval(updateScore, 500)
 
+    function postData(){
+      if (!currentScore.name) {
+        alert("Please enter your name before submitting.");
+        return
+      }
+
+      if (currentScore.score < 0) {
+        alert("Your score is negative - improve your model and try again.");
+        return
+      }
+
+fetch('https://neutral-network-ex-default-rtdb.firebaseio.com/data.json', {
+  method: 'POST',
+  body: JSON.stringify(currentScore)
+})
+.then(response => {
+  console.log('Success:', response);
+})
+.catch(error => {
+  console.error('Error:', error);
+});
+    }
+
 
   </script>
-  <div>
-  <!-- Add an input for your name -->
-  <input type="text" id="name" placeholder="Enter your name">
-  <button id="submit" onclick="alert(JSON.stringify(keyParameters(getParameters())));">Submit</button>
-  <span>Current score: </span><span id="score"></span>
-  <br>
-  <span id="score_calculation"></span>
-  <!-- Add a button to submit your name -->
+  <div class="mdl-grid">
+    <div class="mdl-cell mdl-cell--3-col">
+      <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+        <input class="mdl-textfield__input" type="text" id="name" placeholder="Enter your name">
+        <label class="mdl-textfield__label" for="name">Name</label>
+      </div>
+    </div>
+    <div class="mdl-cell mdl-cell--1-col">
+      <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" onclick="postData();">Submit</button>
+    </div>
+    <div class="mdl-cell mdl-cell--2-col">
+      <span class="mdl-typography--title">Current score: </span><span class="mdl-typography--title" id="score"></span>
+    </div>
+    <div class="mdl-cell mdl-cell--6-col">
+      <span class="mdl-typography--title" id="score_calculation"></span>
+    </div>
   </div>
   <!-- Top Controls -->
   <div id="top-controls">
