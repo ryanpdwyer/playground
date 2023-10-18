@@ -52,7 +52,50 @@ limitations under the License.
   <header>
     <h1 class="l--page">Tinker With a <b>Neural Network</b> <span class="optional">Right Here </span>in Your Browser.<br>Don’t Worry, You Can’t Break It. We Promise.</h1>
   </header>
+  <script>
+    // Extract all parameters from the current url
+    function getParameters() {
+    const params = Object.fromEntries(window.location.hash.slice(1).split("&").map( x => x.split("=")))
+    return params;
+    }
+    const maxPoints = {circle: 75, xor: 50, gauss: 25, spiral: 250};
 
+    function keyParameters(params){
+     const dataset = params.dataset
+     const input_keys = ['x', 'y', 'xTimesY', 'xSquared', 'ySquared', 'cosX', 'sinX', 'cosY', 'sinY']
+     const nInputs = Object.entries(params).filter(x=> input_keys.includes(x[0]) && x[1] === 'true').length
+     const nNeurons = params.networkShape.split(",").map(x => parseInt(x)).reduce( (x, y) => x + y, 0)
+     const nTotal = nInputs + nNeurons
+     const loss = parseFloat(document.getElementById('loss-test').innerHTML)
+     const epochs = parseInt(document.getElementById('iter-number').innerHTML)
+     const score = maxPoints[dataset] - loss*1000.0 - epochs/100.0 - nTotal*3.5
+     document.getElementById('score').innerHTML = score.toFixed(2)
+     const scoreCalculation = `${score} = ${maxPoints[dataset]} - ${loss}*1000 - ${epochs}/100.0 - ${nTotal}*3.5`
+
+     document.getElementById("score_calculation").innerHTML = "Score = MaxPoints - loss*1000 - epochs/100 - (nInputs + nNeurons)*3.5<br>" + scoreCalculation
+     name = document.getElementById('name').value
+     return {name, dataset, nInputs, nNeurons, nTotal, loss, epochs, score}
+    }
+    let currentScore = {}
+
+    function updateScore(){
+      const params = getParameters();
+      currentScore = keyParameters(params);
+    }
+
+    setInterval(updateScore, 500)
+
+
+  </script>
+  <div>
+  <!-- Add an input for your name -->
+  <input type="text" id="name" placeholder="Enter your name">
+  <button id="submit" onclick="alert(JSON.stringify(keyParameters(getParameters())));">Submit</button>
+  <span>Current score: </span><span id="score"></span>
+  <br>
+  <span id="score_calculation"></span>
+  <!-- Add a button to submit your name -->
+  </div>
   <!-- Top Controls -->
   <div id="top-controls">
     <div class="container l--page">
