@@ -85,7 +85,7 @@ limitations under the License.
     const params = Object.fromEntries(window.location.hash.slice(1).split("&").map( x => x.split("=")))
     return params;
     }
-    const maxPoints = {circle: 75, xor: 50, gauss: 50, spiral: 250};
+    const maxPoints = {circle: 75, xor: 75, gauss: 50, spiral: 250};
 
     function keyParameters(params){
      const dataset = params.dataset
